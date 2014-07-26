@@ -58,6 +58,12 @@
     BITS_PER_SAMPLE: 8,
 
     /**
+     * The frequency of the general tuning standard for musical pitch
+     * @type {Number}
+     */
+    A440: 440,
+
+    /**
      * Get things going by adding a some style declarations and 
      * setting up our mouse events.
      **/
@@ -110,6 +116,7 @@
         frequency = this.getRandomFrequency(),
         period = sampleRate / frequency,
         numChannels = this.NUM_CHANNELS,
+        amplitude = Math.pow(2, this.BITS_PER_SAMPLE)/2 - 1,
         wave = new RIFFWAVE(),
         audio = new Audio(),
         i = 0;
@@ -118,8 +125,7 @@
       wave.header.bitsPerSample = this.BITS_PER_SAMPLE;
 
       while(i < this.TONE_LENGTH) {
-        // 127 is amplitude
-        samples[i++] = Math.round(127 * (i/numChannels % period) / (period + 1));
+        samples[i++] = Math.round(amplitude * (i/numChannels % period) / (period + 1));
       }
 
       wave.Make(samples);
@@ -131,13 +137,32 @@
 
     /**
      * Returns a random musical note frequency.
-     * @return {Number} A musicical note frequency
+     * @return {Number} A musicical note frequency in Hz
      */
     getRandomFrequency: function() {
       var interval = this.NOTE_UPPER_BOUND - this.NOTE_LOWER_BOUND,
-        n = Math.floor(Math.random() * interval) + this.NOTE_LOWER_BOUND;
+        n,
+        i;
 
-      return 440 * Math.pow(2, n/12);
+      // create a randomized pool to prevent
+      // duplicate notes
+      if(!this.pool) {
+        this.pool = [];
+
+        // populate the pool
+        for (i = 0; i <= interval; i++) {
+          this.pool[i] = i;
+        }
+
+        // randomize the pool
+        this.pool.sort(function () {
+            return Math.random() - 0.5;
+        });
+      }
+
+      n = this.pool.pop() + this.NOTE_LOWER_BOUND;
+
+      return this.A440 * Math.pow(2, n/12);
     },
 
     /**
