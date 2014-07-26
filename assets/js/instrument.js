@@ -64,8 +64,8 @@
     setup: function() {
       this.colorize();
       this.generateTones();
-      $(document).on('keydown', $.proxy(this.play, this));
-      $(document).on('keyup', $.proxy(this.stop, this));
+      $(document).on('keydown touchstart mousedown', $.proxy(this.play, this));
+      $(document).on('keyup touchend mouseup', $.proxy(this.stop, this));
       // seconds length is numsamples/sampling rate
     },
 
@@ -145,7 +145,18 @@
      * @param  {jQuery.Event} event The triggering event
      */
     play: function( event ) {
-      var audio = this.tones[String.fromCharCode(event.which)];
+      var key, x, y, cell, audio;
+
+      if(event.which <= 3) {
+        x = event.pageX || event.originalEvent.touches[0].pageX || event.originalEvent.changedTouches[0].pageX;
+        y = event.pageY || event.originalEvent.touches[0].pageY || event.originalEvent.changedTouches[0].pageY;
+        cell = document.elementFromPoint(x, y);
+        key = cell.innerHTML;
+      } else {
+        key = String.fromCharCode(event.which);
+      }
+
+      audio = this.tones[key];
 
       if(audio) {
         audio.$cell.addClass(this.PLAYING_CLASS);
@@ -158,7 +169,18 @@
      * @param  {jQuery.Event} event The triggering event
      */
     stop: function( event ) {
-      var audio = this.tones[String.fromCharCode(event.which)];
+      var key, x, y, cell, audio;
+
+      if(event.which <= 3 ) {
+        x = event.pageX || event.originalEvent.touches[0].pageX || event.originalEvent.changedTouches[0].pageX;
+        y = event.pageY || event.originalEvent.touches[0].pageY || event.originalEvent.changedTouches[0].pageY;
+        cell = document.elementFromPoint(x, y);
+        key = cell.innerHTML;
+      } else {
+        key = String.fromCharCode(event.which);
+      }
+
+      audio = this.tones[key];
 
       if(audio) {
         audio.$cell.removeClass(this.PLAYING_CLASS);
