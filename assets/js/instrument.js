@@ -34,7 +34,8 @@
     PLAYING_CLASS: 'playing',
 
     /**
-     * The default length of the tone in number of samples
+     * The default length of the tone in number of samples. 
+     * This is equivalent to 10 seconds (num_samples/sample_rate).
      * @type {Number}
      */
     TONE_LENGTH: 441000,
@@ -72,7 +73,6 @@
       this.generateTones();
       $(document).on('keydown touchstart mousedown', $.proxy(this.play, this));
       $(document).on('keyup touchend mouseup', $.proxy(this.stop, this));
-      // seconds length is numsamples/sampling rate
     },
 
     /**
