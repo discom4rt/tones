@@ -1,4 +1,4 @@
-(function(window, jQuery, undefined) {
+(function(window, document, $, undefined) {
   var Instrument = function() {
     this.$container = $('#grid');
     this.$cells = this.$container.find('.cell');
@@ -193,4 +193,4 @@
   };
 
   window.Instrument = Instrument;
-}(window, jQuery));
+}(window, document, jQuery));
