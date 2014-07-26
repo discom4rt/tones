@@ -1,7 +1,14 @@
 *, *:before, *:after {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
   box-sizing: border-box;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
 }
 
 html, body {
@@ -31,6 +38,9 @@ html, body {
 }
 
 #grid .cell.playing {
+  -webkit-box-shadow: inset 0 0 10000px 10000px rgba(0,0,0,0.25);
+  -moz-box-shadow: inset 0 0 10000px 10000px rgba(0,0,0,0.25);
+  -ms-box-shadow: inset 0 0 10000px 10000px rgba(0,0,0,0.25);
   box-shadow: inset 0 0 10000px 10000px rgba(0,0,0,0.25);
   color: rgba(255, 255, 255, 0.5);
 }
