@@ -119,7 +119,7 @@
 
       while(i < this.TONE_LENGTH) {
         // 127 is amplitude
-        samples[i++] = 127 * (i/numChannels % period) / (period + 1);
+        samples[i++] = Math.round(127 * (i/numChannels % period) / (period + 1));
       }
 
       wave.Make(samples);
