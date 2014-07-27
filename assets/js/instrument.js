@@ -1,10 +1,10 @@
 (function(window, document, $, undefined) {
+
   var Instrument = function() {
     this.$container = $('#grid');
     this.$cells = this.$container.find('.cell');
 
     this.setup();
-    this.sounds = [];
   };
 
   Instrument.prototype = {
@@ -108,31 +108,25 @@
 
     /**
      * Generate a tone, which is a sawtooth wave.
+     * @see http://michaelkrzyzaniak.com/AudioSynthesis/2_Audio_Synthesis/1_Basic_Waveforms/
      * @return {Audio} A playable Audio object
      */
     generateTone: function() {
       var samples = [],
-        sampleRate = this.SAMPLE_RATE,
         frequency = this.getRandomFrequency(),
-        period = sampleRate / frequency,
-        numChannels = this.NUM_CHANNELS,
-        amplitude = Math.pow(2, this.BITS_PER_SAMPLE)/2 - 1,
-        wave = new RIFFWAVE(),
-        audio = new Audio(),
+        period = this.SAMPLE_RATE / frequency,
+        wave = new WaveFile(),
         i = 0;
 
-      wave.header.sampleRate = sampleRate;
-      wave.header.bitsPerSample = this.BITS_PER_SAMPLE;
+      wave.setFormat(this.SAMPLE_RATE, this.BITS_PER_SAMPLE, this.NUM_CHANNELS);
 
       while(i < this.TONE_LENGTH) {
-        samples[i++] = Math.round(amplitude * (i/numChannels % period) / (period + 1));
+        samples[i++] = Math.round(wave.sampleRange * (i/this.NUM_CHANNELS % period) / (period + 1));
       }
 
-      wave.Make(samples);
+      wave.data = samples;
 
-      audio.src = wave.dataURI;
-
-      return audio;
+      return wave.generateAudioTag();
     },
 
     /**
@@ -212,10 +206,10 @@
         audio.currentTime = 0;
         audio.pause();
       }
-
     }
 
   };
 
   window.Instrument = Instrument;
+
 }(window, document, jQuery));
