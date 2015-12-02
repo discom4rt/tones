@@ -34,7 +34,7 @@
     PLAYING_CLASS: 'playing',
 
     /**
-     * The default length of the tone in number of samples. 
+     * The default length of the tone in number of samples.
      * This is equivalent to 10 seconds (num_samples/sample_rate).
      * @type {Number}
      */
@@ -65,7 +65,7 @@
     A440: 440,
 
     /**
-     * Get things going by adding a some style declarations and 
+     * Get things going by adding a some style declarations and
      * setting up our mouse events.
      **/
     setup: function() {
@@ -166,9 +166,12 @@
     play: function( event ) {
       var key, x, y, cell, audio;
 
+      event.preventDefault();
+
       if(event.which <= 3) {
-        x = event.pageX || event.originalEvent.touches[0].pageX || event.originalEvent.changedTouches[0].pageX;
-        y = event.pageY || event.originalEvent.touches[0].pageY || event.originalEvent.changedTouches[0].pageY;
+        var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+        x = event.pageX || touch.pageX;
+        y = event.pageY || touch.pageY;
         cell = document.elementFromPoint(x, y);
         key = cell.innerHTML;
       } else {
@@ -190,9 +193,12 @@
     stop: function( event ) {
       var key, x, y, cell, audio;
 
+      event.preventDefault();
+
       if(event.which <= 3 ) {
-        x = event.pageX || event.originalEvent.touches[0].pageX || event.originalEvent.changedTouches[0].pageX;
-        y = event.pageY || event.originalEvent.touches[0].pageY || event.originalEvent.changedTouches[0].pageY;
+        var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
+        x = event.pageX || touch.pageX;
+        y = event.pageY || touch.pageY;
         cell = document.elementFromPoint(x, y);
         key = cell.innerHTML;
       } else {
