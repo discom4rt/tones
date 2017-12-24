@@ -10,7 +10,7 @@
   Instrument.prototype = {
 
     /**
-     * An integer indicating the lowest note number that should be play
+     * An integer indicating the lowest note number that should be played
      * @type {Number}
      */
     NOTE_LOWER_BOUND: -21,
@@ -160,6 +160,20 @@
     },
 
     /**
+     * Get the x and y coordinates of the given event
+     * @param  {jQuery.Event} event The triggering event
+     * @return {Object} Coordinates of the event
+     */
+    getEventPoint: function( event ) {
+      var touch = (event.originalEvent.touches || event.originalEvent.changedTouches) &&
+        (event.originalEvent.touches[0] || event.originalEvent.changedTouches[0]);
+      x = event.pageX || touch.pageX;
+      y = event.pageY || touch.pageY;
+
+      return { x: x, y: y }
+    },
+
+    /**
      * Play the tone assigned to the pressed key.
      * @param  {jQuery.Event} event The triggering event
      */
@@ -169,10 +183,8 @@
       event.preventDefault();
 
       if(event.which <= 3) {
-        var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-        x = event.pageX || touch.pageX;
-        y = event.pageY || touch.pageY;
-        cell = document.elementFromPoint(x, y);
+        var point = this.getEventPoint(event)
+        cell = document.elementFromPoint(point.x, point.y);
         key = cell.innerHTML;
       } else {
         key = String.fromCharCode(event.which);
@@ -196,10 +208,8 @@
       event.preventDefault();
 
       if(event.which <= 3 ) {
-        var touch = event.originalEvent.touches[0] || event.originalEvent.changedTouches[0];
-        x = event.pageX || touch.pageX;
-        y = event.pageY || touch.pageY;
-        cell = document.elementFromPoint(x, y);
+        var point = this.getEventPoint(event)
+        cell = document.elementFromPoint(point.x, point.y);
         key = cell.innerHTML;
       } else {
         key = String.fromCharCode(event.which);
