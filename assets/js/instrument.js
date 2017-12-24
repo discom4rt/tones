@@ -1,5 +1,96 @@
 (function(window, document, $, undefined) {
 
+  /**
+   * General Wave class to generate samples for a given wave type
+   *
+   * @see http://michaelkrzyzaniak.com/AudioSynthesis/2_Audio_Synthesis/1_Basic_Waveforms/
+   * @param  {Float} frequency   The frequency of the tone for which to generate samples
+   * @param  {Int} sampleRate  The sample rate
+   * @param  {Int} numChannels The number of channels
+   * @param  {Int} sampleRange The range of output sample ouput values to return
+   */
+  var Wave = function (frequency, sampleRate, numChannels, sampleRange) {
+    this.frequency = frequency
+    this.sampleRate = sampleRate
+    this.numChannels = numChannels
+    this.sampleRange = sampleRange
+  }
+
+  Wave.protype = {
+
+    /**
+     * Generate an array of samples for the constructed wave
+     *
+     * @param  {Int} numSamples The number of samples to generate. This should be
+     *  the result of NUM_SECONDS * NUM_CHANNELS * SAMPLE_RATE
+     * @return {Array}            An array of sample values
+     */
+    generateSamples: function (numSamples) {
+      return []
+    }
+  }
+
+  /**
+   * Construct a sawtooth wave
+   */
+  var SawtoothWave = function (frequency, sampleRate, numChannels, sampleRange) {
+    Wave.call(this, frequency, sampleRate, numChannels, sampleRange)
+  }
+
+  SawtoothWave.prototype = Object.create(Wave.prototype, {
+    generateSamples: {
+
+      /**
+       * Generate samples for a sawtooth wave
+       */
+      value: function (numSamples) {
+        var samples = [],
+          period = this.sampleRate / this.frequency,
+          i = 0;
+
+        while(i < numSamples) {
+          samples[i++] = Math.round(this.sampleRange * (i / this.numChannels % period) / (period + 1));
+        }
+
+        return samples
+      }
+    }
+  })
+  SawtoothWave.prototype.constructor = SawtoothWave;
+
+  /**
+   * Construct a pulse wave
+   */
+  var PulseWave = function (frequency, sampleRate, numChannels, sampleRange) {
+    Wave.call(this, frequency, sampleRate, numChannels, sampleRange)
+  }
+
+  PulseWave.prototype = Object.create(Wave.prototype, {
+    generateSamples: {
+
+      /**
+       * Generate samples for a pulse wave
+       */
+      value: function (numSamples) {
+        var samples = [],
+          wavelength = this.sampleRate / this.frequency,
+          pulseWidth = 0.9,
+          i = 0;
+
+        while(i < numSamples) {
+          if((i / this.numChannels % wavelength) < (wavelength * pulseWidth)) {
+            samples[i++] = Math.round(this.sampleRange * 1)
+          } else {
+            samples[i++] = 0
+          }
+        }
+
+        return samples
+      }
+    }
+  })
+  PulseWave.prototype.constructor = PulseWave;
+
   var Instrument = function() {
     this.$container = $('#grid');
     this.$cells = this.$container.find('.cell');
@@ -36,6 +127,7 @@
     /**
      * The default length of the tone in number of samples.
      * This is equivalent to 10 seconds (num_samples/sample_rate).
+     * = NUM_SECONDS * NUM_CHANNELS * SAMPLE_RATE
      * @type {Number}
      */
     TONE_LENGTH: 441000,
@@ -107,26 +199,20 @@
     },
 
     /**
-     * Generate a tone, which is a sawtooth wave.
-     * @see http://michaelkrzyzaniak.com/AudioSynthesis/2_Audio_Synthesis/1_Basic_Waveforms/
+     * Generate a tone, formed by a pulse wave.
      * @return {Audio} A playable Audio object
      */
     generateTone: function() {
       var samples = [],
-        frequency = this.getRandomFrequency(),
-        period = this.SAMPLE_RATE / frequency,
-        wave = new WaveFile(),
+        waveFile = new WaveFile(),
+        wave = null,
         i = 0;
 
-      wave.setFormat(this.SAMPLE_RATE, this.BITS_PER_SAMPLE, this.NUM_CHANNELS);
+      waveFile.setFormat(this.SAMPLE_RATE, this.BITS_PER_SAMPLE, this.NUM_CHANNELS);
+      wave = new PulseWave(this.getRandomFrequency(), this.SAMPLE_RATE, this.NUM_CHANNELS, waveFile.sampleRange)
+      waveFile.data = wave.generateSamples(this.TONE_LENGTH)
 
-      while(i < this.TONE_LENGTH) {
-        samples[i++] = Math.round(wave.sampleRange * (i/this.NUM_CHANNELS % period) / (period + 1));
-      }
-
-      wave.data = samples;
-
-      return wave.generateAudioTag();
+      return waveFile.generateAudioTag();
     },
 
     /**
@@ -219,8 +305,8 @@
 
       if(audio) {
         audio.$cell.removeClass(this.PLAYING_CLASS);
-        audio.currentTime = 0;
         audio.pause();
+        audio.currentTime = 0;
       }
     }
 
