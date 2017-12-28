@@ -16,7 +16,7 @@
     this.sampleRange = sampleRange
   }
 
-  Wave.protype = {
+  Wave.prototype = {
 
     /**
      * Generate an array of samples for the constructed wave
